@@ -8,7 +8,7 @@ async function heatMap() {
 
   const xAccessor = (d) => d.monthlyVariance.year;
   const yAccessor = (d) => d.monthlyVariance.month;
-  const varAccessor = (d) => d.monthlyVariance.variance;
+  const varAccessor = (d) => Math.round(d.monthlyVariance.variance);
   // Heat maps have three dimensions: x, y, and a color scale.
 
   // 2. Create chart dimensions
@@ -44,44 +44,65 @@ async function heatMap() {
     );
 
   // 4. Create scales
-    const xScale = d3
-      .scaleTime()
-      // The complete set of values for the x range
-      .domain(d3.extent(initialData, xAccessor))
-      // sets the parameters that the domain needs to scale to
-      .range([0, dimensions.boundedWidth]);
+  const xScale = d3
+    .scaleTime()
+    // The complete set of values for the x range
+    .domain(d3.extent(initialData, xAccessor))
+    // sets the parameters that the domain needs to scale to
+    .range([0, dimensions.boundedWidth]);
 
-    const yScale = d3
-      .scaleTime()
-      .domain(d3.extent(initialData, yAccessor))
+  const yScale = d3
+    .scaleTime()
+    .domain(d3.extent(initialData, yAccessor))
     .range([0, dimensions.boundedHeight]);
-  
+
   const tooltip = d3
     .select('body')
     .append('div')
     .attr('id', 'tooltip')
     .style('visibility', 'hidden');
 
-
   // 5. Draw data
+
+  function mapColorToTemp(temp) {
+    if (temp < 3.9) {
+      return 'darkblue';
+    } else if (temp >= 3.9 || temp < 5.0) {
+      return 'blue';
+    } else if (temp >= 5.0 || temp < 6.1) {
+      return 'aqua';
+    } else if (temp >= 6.1 || temp < 7.2) {
+      return 'lightcyan';
+    } else if (temp >= 7.2 || temp < 8.3) {
+      return 'gold';
+    } else if (temp >= 8.3 || temp < 9.5) {
+      return 'darkorange';
+    } else if (temp >= 9.5 || temp < 10.6) {
+      return 'orangered';
+    } else if (temp >= 10.6 || temp < 11.7) {
+      return 'red';
+    } else {
+      return 'darkred';
+    }
+  }
 
   // 6. Draw Peripherals
 
-   const xAxisGenerator = d3.axisBottom().scale(xScale).ticks(12, 'y');
-   const xAxis = bounds
-     .append('g')
-     .call(xAxisGenerator)
-     .attr('id', 'x-axis')
-     .style('transform', `translateY(${dimensions.boundedHeight}px)`);
+  const xAxisGenerator = d3.axisBottom().scale(xScale).ticks(12, 'y');
+  const xAxis = bounds
+    .append('g')
+    .call(xAxisGenerator)
+    .attr('id', 'x-axis')
+    .style('transform', `translateY(${dimensions.boundedHeight}px)`);
 
-   const xAxisLabel = xAxis
-     .append('text')
-     .attr('x', dimensions.boundedWidth / 2)
-     .attr('y', dimensions.margin.bottom - 10)
-     .attr('fill', 'black')
-     .style('font-size', '1.4em')
-     .text('Years');
-  
+  const xAxisLabel = xAxis
+    .append('text')
+    .attr('x', dimensions.boundedWidth / 2)
+    .attr('y', dimensions.margin.bottom - 10)
+    .attr('fill', 'black')
+    .style('font-size', '1.4em')
+    .text('Years');
+
   const yAxisGenerator = d3.axisLeft().scale(yScale).ticks(12, '%b');
 
   const yAxis = bounds.append('g').attr('id', 'y-axis').call(yAxisGenerator);
