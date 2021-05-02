@@ -5,18 +5,22 @@ async function heatMap() {
   );
 
   const baseTemp = initialData.baseTemperature;
+  const dataset = initialData.monthlyVariance;
+  const parseMonth = d3.timeParse('%B');
+  const parseYear = d3.timeParse('%Y')
 
-  const xAccessor = (d) => d.monthlyVariance.year;
-  const yAccessor = (d) => d.monthlyVariance.month;
-  const varAccessor = (d) => Math.round(d.monthlyVariance.variance);
+  const xAccessor = (d) => parseYear(d.year);
+  const yAccessor = (d) => d.month;
+  const varAccessor = (d) => Math.round(d.variance);
   // Heat maps have three dimensions: x, y, and a color scale.
+  console.log(xAccessor(dataset[0]));
 
   // 2. Create chart dimensions
   // returns the minimum value from the iterable given as an argument
-  const width = d3.min([window.innerWidth * 0.9, window.innerHeight * 0.9]);
+  const width = window.innerWidth * 0.9;
   let dimensions = {
-    height: width,
     width,
+    height: width,
     margin: {
       top: 10,
       right: 10,
@@ -24,8 +28,10 @@ async function heatMap() {
       left: 50,
     },
   };
+
   dimensions.boundedWidth =
     dimensions.width - dimensions.margin.left - dimensions.margin.right;
+
   dimensions.boundedHeight =
     dimensions.height - dimensions.margin.top - dimensions.margin.bottom;
 
@@ -41,19 +47,22 @@ async function heatMap() {
     .style(
       'transform',
       `translate(${dimensions.margin.left}px, ${dimensions.margin.top}px)`
-    );
+  );
+  
+  const cellWidth = dimensions.boundedWidth / dataset.length;
+  const cellHeight = dimensions.boundedHeight / 12;
 
   // 4. Create scales
   const xScale = d3
     .scaleTime()
     // The complete set of values for the x range
-    .domain(d3.extent(initialData, xAccessor))
+    .domain(d3.extent(dataset, xAccessor))
     // sets the parameters that the domain needs to scale to
     .range([0, dimensions.boundedWidth]);
 
   const yScale = d3
-    .scaleTime()
-    .domain(d3.extent(initialData, yAccessor))
+    .scaleLinear()
+    .domain(d3.extent(dataset, yAccessor))
     .range([0, dimensions.boundedHeight]);
 
   const tooltip = d3
@@ -63,6 +72,21 @@ async function heatMap() {
     .style('visibility', 'hidden');
 
   // 5. Draw data
+
+    const heat = bounds
+      .selectAll('rect')
+      .data(dataset)
+      .enter()
+      .append('rect')
+      .attr('x', (d) => xScale(xAccessor(d)))
+      .attr('y', (d) => yScale(yAccessor(d)))
+      .attr('width', cellWidth)
+      .attr('height', cellHeight)
+      .attr('class', 'cell')
+      .attr('data-year', (d) => xAccessor(d))
+      .attr('data-month', (d) => yAccessor(d))
+      .attr('data-temp', (d) => varAccessor(d))
+      .attr('fill', (d) => mapColorToTemp(d));
 
   function mapColorToTemp(temp) {
     if (temp < 3.9) {
@@ -103,7 +127,7 @@ async function heatMap() {
     .style('font-size', '1.4em')
     .text('Years');
 
-  const yAxisGenerator = d3.axisLeft().scale(yScale).ticks(12, '%b');
+  const yAxisGenerator = d3.axisLeft().scale(yScale).ticks(12, 'b');
 
   const yAxis = bounds.append('g').attr('id', 'y-axis').call(yAxisGenerator);
 
