@@ -2,12 +2,11 @@ div#tooltip {
   color: white;
   position: absolute;
   text-align: center;
-  width: 60px;
+  width: 90px;
   height: fit-content;
   padding: 2px;
   font: 12px sans-serif;
-  background: black;
-  border: 0px;
+  background-color:black;
   border-radius: 8px;
   pointer-events: none;
 }

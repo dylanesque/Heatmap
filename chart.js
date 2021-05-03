@@ -75,9 +75,8 @@ async function heatMap() {
 
   const yScale = d3
     .scaleLinear()
-    .domain(d3.extent(dataset, yAccessor))
+    .domain([0, 12])
     .range([0, dimensions.boundedHeight]);
-  console.log(d3.extent(dataset, yAccessor));
 
   const tooltip = d3
     .select('body')
@@ -93,14 +92,31 @@ async function heatMap() {
     .enter()
     .append('rect')
     .attr('x', (d) => xScale(xAccessor(d)))
-    .attr('y', (d) => yScale(yAccessor(d)))
+    .attr('y', (d) => yScale(yAccessor(d)) - cellHeight)
     .attr('width', cellWidth)
     .attr('height', cellHeight)
     .attr('class', 'cell')
     .attr('data-year', (d) => d.year)
     .attr('data-month', (d) => d.month - 1)
     .attr('data-temp', (d) => varAccessor(d))
-    .attr('fill', (d) => mapColorToTemp(Math.round(baseTemp + varAccessor(d))));
+    .attr('fill', (d) => mapColorToTemp(Math.round(baseTemp + varAccessor(d))))
+    .on('mouseover', onMouseOver)
+    .on('mouseleave', onMouseLeave);
+  
+  function onMouseOver(d) {
+     tooltip.transition().duration(200).style('visibility', 'visible');
+     tooltip
+       .html(d.year + '-' + months[d.month - 1] + '<br>' + baseTemp + '<br>' + d.variance)
+       .style('left', d3.event.pageX + 'px')
+       .style('top', d3.event.pageY - 28 + 'px')
+       .attr('data-year', d.year)
+       .attr('data-month', d.month - 1)
+       .attr('data-temp', varAccessor(d));
+   }
+
+   function onMouseLeave() {
+     tooltip.transition().duration(200).style('visibility', 'hidden');
+   }
 
 
   function mapColorToTemp(temp) {
@@ -157,7 +173,10 @@ async function heatMap() {
     .style('font-size', '1.4em')
     .text('Months')
     .style('transform', 'rotate(-90deg)')
+    .style('transform', `translateY(${-(cellHeight / 2)}px)`)
     .style('text-anchor', 'middle');
+  
+  
 }
 
 heatMap();
