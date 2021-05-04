@@ -3,7 +3,7 @@ async function heatMap() {
   const initialData = await d3.json(
     'https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/master/global-temperature.json'
   );
-    const months = [
+  const months = [
     'January',
     'February',
     'March',
@@ -18,11 +18,22 @@ async function heatMap() {
     'December',
   ];
 
+  const heatColors = [
+    'lightcyan',
+    'lightskyblue',
+    'aqua',
+    'darkblue',
+    'gold',
+    'darkorange',
+    'orangered',
+    'darkred',
+  ];
 
   const baseTemp = initialData.baseTemperature;
   const dataset = initialData.monthlyVariance;
 
   const parseYear = d3.timeParse('%Y');
+
 
   const xAccessor = (d) => parseYear(parseInt(d.year));
   const yAccessor = (d) => d.month;
@@ -35,10 +46,10 @@ async function heatMap() {
     width,
     height: width * 0.4,
     margin: {
-      top: 10,
+      top: 5,
       right: 10,
       bottom: 50,
-      left: 50,
+      left: 60,
     },
   };
 
@@ -75,7 +86,8 @@ async function heatMap() {
 
   const yScale = d3
     .scaleLinear()
-    .domain([0, 12])
+    // raise the question of how modifying this domain upper bound throws everything off
+    .domain([0, 11])
     .range([0, dimensions.boundedHeight]);
 
   const tooltip = d3
@@ -83,6 +95,15 @@ async function heatMap() {
     .append('div')
     .attr('id', 'tooltip')
     .style('visibility', 'hidden');
+
+  const legend = d3
+    .select('#legend')
+    .data(heatColors)
+    .enter()
+    .append('rect')
+    .attr('width', '10px')
+    .attr('height', '10px')
+    .attr('fill', (d, i) => heatColors[i]);
 
   // 5. Draw data
 
@@ -102,42 +123,49 @@ async function heatMap() {
     .attr('fill', (d) => mapColorToTemp(Math.round(baseTemp + varAccessor(d))))
     .on('mouseover', onMouseOver)
     .on('mouseleave', onMouseLeave);
-  
+
   function onMouseOver(d) {
-     tooltip.transition().duration(200).style('visibility', 'visible');
-     tooltip
-       .html(d.year + '-' + months[d.month - 1] + '<br>' + baseTemp + '<br>' + d.variance)
-       .style('left', d3.event.pageX + 'px')
-       .style('top', d3.event.pageY - 28 + 'px')
-       .attr('data-year', d.year)
-       .attr('data-month', d.month - 1)
-       .attr('data-temp', varAccessor(d));
-   }
+    tooltip.transition().duration(200).style('visibility', 'visible');
+    tooltip
+      .html(
+        d.year +
+          '-' +
+          months[d.month - 1] +
+          '<br>' +
+          baseTemp +
+          '<br>' +
+          d.variance
+      )
+      .style('left', d3.event.pageX + 'px')
+      .style('top', d3.event.pageY - 28 + 'px')
+      .attr('data-year', d.year)
+      .attr('data-month', d.month - 1)
+      .attr('data-temp', varAccessor(d));
+  }
 
-   function onMouseLeave() {
-     tooltip.transition().duration(200).style('visibility', 'hidden');
-   }
-
+  function onMouseLeave() {
+    tooltip.transition().duration(200).style('visibility', 'hidden');
+  }
 
   function mapColorToTemp(temp) {
     if (temp < 3.9) {
-      return 'darkblue';
+      return heatColors[0];
     } else if (temp >= 3.9 && temp < 5.0) {
-      return 'blue';
+      return heatColors[1];
     } else if (temp >= 5.0 && temp < 6.1) {
-      return 'aqua';
+      return heatColors[2];
     } else if (temp >= 6.1 && temp < 7.2) {
-      return 'lightcyan';
+      return heatColors[3];
     } else if (temp >= 7.2 && temp < 8.3) {
-      return 'gold';
+      return heatColors[4];
     } else if (temp >= 8.3 && temp < 9.5) {
-      return 'darkorange';
+      return heatColors[5];
     } else if (temp >= 9.5 && temp < 10.6) {
-      return 'orangered';
+      return heatColors[6];
     } else if (temp >= 10.6 && temp < 11.7) {
-      return 'red';
+      return heatColors[7];
     } else {
-      return 'darkred';
+      return heatColors[8];
     }
   }
 
@@ -148,7 +176,7 @@ async function heatMap() {
     .append('g')
     .call(xAxisGenerator)
     .attr('id', 'x-axis')
-    .style('transform', `translateY(${dimensions.boundedHeight}px)`);
+    .style('transform', `translateY(${dimensions.boundedHeight + 40}px)`);
 
   const xAxisLabel = xAxis
     .append('text')
@@ -161,7 +189,7 @@ async function heatMap() {
   const yAxisGenerator = d3
     .axisLeft()
     .scale(yScale)
-    .tickFormat((d, i) => months[i] );
+    .tickFormat((d, i) => months[i]);
 
   const yAxis = bounds.append('g').attr('id', 'y-axis').call(yAxisGenerator);
 
@@ -169,14 +197,12 @@ async function heatMap() {
     .append('text')
     .attr('x', -dimensions.boundedHeight / 2)
     .attr('y', -dimensions.margin.left + 10)
+    .attr('dy', '-40px')
     .attr('fill', 'black')
     .style('font-size', '1.4em')
     .text('Months')
     .style('transform', 'rotate(-90deg)')
-    .style('transform', `translateY(${-(cellHeight / 2)}px)`)
     .style('text-anchor', 'middle');
-  
-  
 }
 
 heatMap();
