@@ -16,6 +16,7 @@ h1, p {
 }
 
 #legend {
-  margin: 0 auto;
-  width: fit-content;
+display: block;
+height: fit-content;
+margin: 0 auto;
 }

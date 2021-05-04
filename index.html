@@ -1,20 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Document</title>
-    <link rel="stylesheet" href="./style.css">
-</head>
-<body>
-  <h1 id="title">Monthly Global Land-Surface Temperature</h1>
-  <p id="description">1753 - 2015: base temperature 8.66℃</p>
-  <div id="legend"></div>
-  <div id="wrapper"></div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <h1 id="title">Monthly Global Land-Surface Temperature</h1>
+    <p id="description">1753 - 2015: base temperature 8.66℃</p>
+    <svg id="legend">
+      <g><rect x="10" y="0" width="30" height="30" fill="lightcyan" /></g>
+      <g><rect x="40" y="0" width="30" height="30" fill="lightskyblue" /></g>
+      <g><rect x="70" y="0" width="30" height="30" fill="aqua" /></g>
+      <g><rect x="100" y="0" width="30" height="30" fill="darkblue" /></g>
+      <g><rect x="130" y="0" width="30" height="30" fill="gold" /></g>
+      <g><rect x="160" y="0" width="30" height="30" fill="darkorange" /></g>
+      <g><rect x="190" y="0" width="30" height="30" fill="orangered" /></g>
+      <g><rect x="220" y="0" width="30" height="30" fill="darkred" /></g>
+    </svg>
+    <div id="wrapper"></div>
 
-  <script src="https://d3js.org/d3.v5.min.js"></script>
-  <script src="https://cdn.freecodecamp.org/testable-projects-fcc/v1/bundle.js"></script>
-  <script src="chart.js"></script>
-</body>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://cdn.freecodecamp.org/testable-projects-fcc/v1/bundle.js"></script>
+    <script src="chart.js"></script>
+  </body>
 </html>

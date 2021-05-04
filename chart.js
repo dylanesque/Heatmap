@@ -96,15 +96,6 @@ async function heatMap() {
     .attr('id', 'tooltip')
     .style('visibility', 'hidden');
 
-  const legend = d3
-    .select('#legend')
-    .data(heatColors)
-    .enter()
-    .append('rect')
-    .attr('width', '10px')
-    .attr('height', '10px')
-    .attr('fill', (d, i) => heatColors[i]);
-
   // 5. Draw data
 
   const heat = bounds
